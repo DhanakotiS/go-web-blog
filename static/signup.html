@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Login</title>
+    <title>User Signup</title>
     <link rel="stylesheet" href="/static/style.css">
     <style>
         body {
@@ -67,20 +67,28 @@
 </head>
 <body>
     <div class="login-box">
-        <h2 class="login-title">Welcome Back</h2>
-        <p class="subtitle">Sign in to continue</p>
-        <form action="/login" method="POST">
+        <h2 class="login-title">Create Account</h2>
+        <p class="subtitle">Sign up to get started</p>
+        <form action="/signup" method="POST">
+            <div class="input-field">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required autocomplete="email">
+            </div>
+            <div class="input-field">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required autocomplete="name">
+            </div>
             <div class="input-field">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" required autocomplete="username">
             </div>
             <div class="input-field">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required autocomplete="current-password">
+                <input type="password" id="password" name="password" required autocomplete="new-password">
             </div>
-            <button type="submit" class="btn btn-large submit-btn">Sign In</button>
+            <button type="submit" class="btn btn-large submit-btn">Sign Up</button>
         </form>
-        <p class="footer-text">Don't have an account? <a href="/signup" style="color: #667eea; text-decoration: none;">Sign Up</a></p>
+        <p class="footer-text">Already have an account? <a href="/login" style="color: #667eea; text-decoration: none;">Sign In</a></p>
         <div class="back-link">
             <a href="/">← Back to Home</a>
         </div>
