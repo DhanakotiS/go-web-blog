@@ -2,19 +2,32 @@ package dbops
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 
 	constants "go-web-blog/constants"
+	"go-web-blog/models"
 )
 
 var collection *mongo.Collection
 var ctx = context.TODO()
-var MONGOURI = constants.MONGOURI
+
+// var MONGOURI = constants.MONGOURI
+var MONGOURI = os.Getenv("MONGO_URI")
+
+type User struct {
+	name     string
+	username string
+	password string
+	email    string
+	userid   string
+}
 
 func Init() (context.Context, *mongo.Client) {
 	clientOptions := options.Client().ApplyURI(MONGOURI)
@@ -45,6 +58,29 @@ func Write(collection string, data interface{}) (bson.ObjectID, error) {
 		return bson.ObjectID{}, err
 	}
 	return insertedID, nil
+}
+
+func Read(ctx context.Context, client *mongo.Client, collect *mongo.Collection, user string) (models.User, error) {
+
+	filter := bson.D{{Key: "username", Value: user}}
+	cursor, err := collect.Find(ctx, filter)
+	if err != nil {
+		return models.User{}, fmt.Errorf("Error: User not found %s", err)
+	}
+	var res []models.User
+	var userdet models.User
+	if err = cursor.All(context.TODO(), &res); err != nil {
+		fmt.Printf("Error %s\n", err)
+	}
+
+	for _, result := range res {
+		res, _ := bson.MarshalExtJSON(result, false, false)
+		err := json.Unmarshal(res, &userdet)
+		if err != nil {
+			return models.User{}, fmt.Errorf("Error: %s", err)
+		}
+	}
+	return userdet, nil
 }
 
 // func Read(ctx context.Context, client *mongo.Client, collect_ *mongo.Collection) {
