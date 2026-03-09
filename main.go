@@ -128,7 +128,28 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			Username: r.FormValue("username"),
 			Password: r.FormValue("password"),
 		}
-		setCookie(w, creds)
+
+		ctx, client := dbops.Init()
+		defer func() {
+			if err := client.Disconnect(ctx); err != nil {
+				log.Printf("Mongo disconnect error: %v", err)
+			}
+		}()
+
+		usersCollection := client.Database(constants.DBNAME).Collection("users")
+		userdetails, err := dbops.Read(ctx, client, usersCollection, creds.Username)
+		if err != nil || userdetails.Username == "" {
+			http.Redirect(w, r, "/login", http.StatusUnauthorized)
+			return
+		}
+
+		encodedPassword := base64.StdEncoding.EncodeToString([]byte(creds.Password))
+		if userdetails.Password != encodedPassword {
+			http.Redirect(w, r, "/login", http.StatusUnauthorized)
+			return
+		}
+
+		setCookie(w, userdetails)
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 	default:
 		fmt.Fprintf(w, "Method %s is not supported.", r.Method)
