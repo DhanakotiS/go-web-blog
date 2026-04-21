@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"os"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -18,16 +17,10 @@ import (
 var collection *mongo.Collection
 var ctx = context.TODO()
 
-// var MONGOURI = constants.MONGOURI
-var MONGOURI = os.Getenv("MONGO_URI")
+var MONGOURI = constants.MONGOURI
 
-type User struct {
-	name     string
-	username string
-	password string
-	email    string
-	userid   string
-}
+// var MONGOURI = os.Getenv("MONGO_URI")
+// var MONGOURI = "mongodb://mongo:27017"
 
 func Init() (context.Context, *mongo.Client) {
 	clientOptions := options.Client().ApplyURI(MONGOURI)
@@ -47,6 +40,14 @@ func Init() (context.Context, *mongo.Client) {
 
 func Write(collection string, data interface{}) (bson.ObjectID, error) {
 	ctx, client := Init()
+
+	defer func() {
+		if err := client.Disconnect(ctx); err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println("Connection to MongoDB closed.")
+	}()
+
 	coll := client.Database(constants.DBNAME).Collection(collection)
 
 	res, err := coll.InsertOne(ctx, data)
@@ -61,6 +62,8 @@ func Write(collection string, data interface{}) (bson.ObjectID, error) {
 }
 
 func Read(ctx context.Context, client *mongo.Client, collect *mongo.Collection, user string) (models.User, error) {
+
+	// w, r = http_headers.W, http_headers.R
 
 	filter := bson.D{{Key: "username", Value: user}}
 	cursor, err := collect.Find(ctx, filter)

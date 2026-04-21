@@ -26,6 +26,4 @@ RUN chown -R app:app /app
 
 USER app
 
-EXPOSE 8080
-
 ENTRYPOINT ["/app/app-server"]

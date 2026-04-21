@@ -25,6 +25,7 @@ var BLOGSFILE = constants.BLOGSFILE
 
 type Blog = models.Blog
 type User = models.User
+type HTTP = models.HTTP
 
 func getMethod(w http.ResponseWriter, r *http.Request, page string) {
 	cookie, err := r.Cookie("username")
@@ -137,6 +138,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		}()
 
 		usersCollection := client.Database(constants.DBNAME).Collection("users")
+		// http_headers = HTTP{W: w, R: r}
 		userdetails, err := dbops.Read(ctx, client, usersCollection, creds.Username)
 		if err != nil || userdetails.Username == "" {
 			http.Redirect(w, r, "/login", http.StatusUnauthorized)

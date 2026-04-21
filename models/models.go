@@ -1,5 +1,7 @@
 package models
 
+import "net/http"
+
 type User struct {
 	Name     string `bson:"name"`
 	Username string `bson:"username"`
@@ -13,4 +15,9 @@ type Blog struct {
 	BlogID  string `bson:"blogid"`
 	Title   string `bson:"title"`
 	Content string `bson:"content"`
+}
+
+type HTTP struct {
+	W http.ResponseWriter
+	R *http.Request
 }
